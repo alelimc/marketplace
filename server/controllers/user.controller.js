@@ -1,6 +1,7 @@
 import Product from '../models/user.model.js'
 import extend from 'lodash/extend.js'
 import errorHandler from './error.controller.js'
+//import { Op } from 'sequelize';
 
 const create = async (req, res) => { 
 const product = new Product(req.body) 
@@ -27,6 +28,18 @@ error: errorHandler.getErrorMessage(err)
 })
 } 
 }
+//Fetch data that contain 'kw' in name
+const productByName = async (req, res) => {
+    const { name } = req.query;
+    try {
+        const products = await Product.find({ name: { $regex: name, $options: 'i' } });
+        res.json(products);
+    } catch (err) {
+        res.status(500).json({
+            message: err.message || "Some error occurred while retrieving products."
+        });
+    }
+};
 
 const productByID = async (req, res, next, id) => { 
 try {
@@ -43,10 +56,8 @@ error: "Could not retrieve product"
 }) 
 }
 }
-
+   
 const read = (req, res) => {
-req.profile.hashed_password = undefined 
-req.profile.salt = undefined
 return res.json(req.profile) 
 }
 
@@ -56,8 +67,6 @@ let product = req.profile
 product = extend(product, req.body) 
 product.updated = Date.now() 
 await product.save()
-//user.hashed_password = undefined 
-//user.salt = undefined
 res.json(product) 
 } catch (err) {
 return res.status(400).json({
@@ -70,8 +79,6 @@ const remove = async (req, res) => {
 try {
 let product = req.profile
 let deletedProduct = await product.deleteOne() 
-//deletedProduct.hashed_password = undefined 
-//deletedProduct.salt = undefined
 res.json(deletedProduct) 
 } catch (err) {
 return res.status(400).json({
@@ -79,5 +86,18 @@ error: errorHandler.getErrorMessage(err)
 })
 } 
 }
+// removes all in products
+const removeAll = async (req, res) => {
+    try {
+        await Product.deleteMany({});
+        res.json({ message: 'All products deleted successfully' });
+    } catch (err) {
+        return res.status(400).json({
+            error: errorHandler.getErrorMessage(err)
+        });
+    }
+}
 
-export default { create, productByID, read, list, remove, update }
+
+//export default { create, productByID, read, list, remove, update, productByName }
+export default { create, productByID, read, list, remove, removeAll, update, productByName }
