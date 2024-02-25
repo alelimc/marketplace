@@ -1,7 +1,6 @@
-import Product from '../models/user.model.js'
+import Product from '../models/product.model.js'
 import extend from 'lodash/extend.js'
 import errorHandler from './error.controller.js'
-//import { Op } from 'sequelize';
 
 const create = async (req, res) => { 
 const product = new Product(req.body) 
@@ -19,7 +18,6 @@ error: errorHandler.getErrorMessage(err)
 
 const list = async (req, res) => { 
 try {
-//let users = await User.find().select('name email updated created') 
 let products = await Product.find().select('name description price quantity category') 
 res.json(products)
 } catch (err) {
@@ -28,9 +26,10 @@ error: errorHandler.getErrorMessage(err)
 })
 } 
 }
+
 //Fetch data that contain 'kw' in name
 const productByName = async (req, res) => {
-    const { name } = req.query;
+    const name = req.query.name;
     try {
         const products = await Product.find({ name: { $regex: name, $options: 'i' } });
         res.json(products);
@@ -98,6 +97,4 @@ const removeAll = async (req, res) => {
     }
 }
 
-
-//export default { create, productByID, read, list, remove, update, productByName }
 export default { create, productByID, read, list, remove, removeAll, update, productByName }
