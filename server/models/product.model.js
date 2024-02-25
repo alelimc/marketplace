@@ -12,8 +12,6 @@ required: 'Name is required'
 description: {
 type: String,
 trim: true,
-// unique: 'Email already exists',
-//match: [/.+\@.+\..+/, 'Please fill a valid email address'],
 required: 'Description is required'
 },
 
